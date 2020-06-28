@@ -28,7 +28,7 @@ CREATE TABLE `postcodes`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
-# Table taht we load postcode_outs and their towns into from Wikipedia
+# Table that we load postcode_outs and their towns into from Wikipedia
 DROP TABLE IF EXISTS `postcode_towns`;
 CREATE TABLE `postcode_towns`
 (
