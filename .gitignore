@@ -1,4 +1,4 @@
 vendor/*
 data/*
 composer.*
-
+core/DBConfig.php

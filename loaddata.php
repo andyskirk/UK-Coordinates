@@ -1,18 +1,14 @@
 <?php
-
-
-
-
 namespace PHPCoord;
 
 require "vendor/autoload.php";
 
 use \PDO;
 
-require_once("DBConfig.php");
+require_once("core/DBConfig.php");
 use \core\DBConfig\DBConfig;
 
-require_once("functions.php");
+require_once("core/functions.php");
 
 /*
 USAGE:
@@ -24,10 +20,10 @@ USAGE:
 */
 
 try {
-    $dbConfig = new DBConfig();
 
+    // Form our database connection, using dbconfig class to define our settings
+    $dbConfig = new \DBConfig\DBConfig();
     $dbh = new PDO("mysql:host={$dbConfig->server};dbname=$dbConfig->db_name", "$dbConfig->db_user", "$dbConfig->db_pass");
-
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Function to output the first part of a uk postcode
@@ -50,7 +46,7 @@ try {
     }
 
     // Load the CSV's and insert into the database
-    $sql = "INSERT INTO postcodes VALUES (:postcode, :east, :north, :admin_county_code, :admin_district_code, :admin_ward_code)";
+    $sql = "INSERT INTO postcodes VALUES (:postcode, :postcode_lookup, :east, :north, :admin_county_code, :admin_district_code, :admin_ward_code)";
     $stmt = $dbh->prepare($sql);
     $row_count = 0; // Tells us how many rows of data processed
     foreach (scandir(__DIR__ . "/data") as $csv_filename) {
@@ -65,6 +61,7 @@ try {
         $sql_insert_fields = array();
         while (($data = fgetcsv($csv_file_resource)) !== false) {
             $params[":postcode"] = $data[0];
+            $params[":postcode_lookup"] = createSearchString($data[0]);
             $params[":east"] = $data[2];
             $params[":north"] = $data[3];
             $params[":admin_county_code"] = $data[7];
@@ -97,7 +94,7 @@ try {
     foreach (generate_postcodes($dbh) as $postcode) {
 
         // Set an array of wildcard bindings per iteration
-        $insert_strings[] = "(?,?,?,?)";
+        $insert_strings[] = "(?,?,?,?,?)";
 
         // Use PHPCoord\OSRef to convert the easterly/northenly values to latitude/longitude values
         $OSRef = new \PHPCoord\OSRef(intval($postcode['east']), intval($postcode['north']));
@@ -106,6 +103,7 @@ try {
         // Add the values for this iteration to the params array
         array_push($params,
             $postcode['postcode'],
+            createSearchString($postcode['postcode']),
             getUKPostcodeFirstPart($postcode['postcode']),
             $LatLng->getLat(),
             $LatLng->getLng()
