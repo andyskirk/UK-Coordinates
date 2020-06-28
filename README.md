@@ -1,7 +1,7 @@
 # UK-Coordinates
 A proof of concept for geographical mapping of UK towns and postcodes, using CodePoint Open's downloadable dataset and Wikipedia's postcode out list of town names.
 Automatic conversion from UTM formatted co-ordinates into latitude/longitude co-ordinates on database creation.
-Allows looking up within a radius of any UK postcode, looking up the town name for a post code, or postcode lists within a town.
+Allows looking up within a mile (or kilometer) radius of any UK postcode, looking up the town name with a post code, or postcode lists within a town.
 
 # Building your database to produce geographical for UK Postcodes and Towns
 1) Install PHPCoord (https://github.com/dvdoug/PHPCoord)
